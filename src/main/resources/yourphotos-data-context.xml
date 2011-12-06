@@ -40,4 +40,6 @@
 
 	<tx:annotation-driven />
 
+	<jpa:repositories base-package="org.upsam.tecmov.yourphotos.domain" />
+
 </beans:beans>
