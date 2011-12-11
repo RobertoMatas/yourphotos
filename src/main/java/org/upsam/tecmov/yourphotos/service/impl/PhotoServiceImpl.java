@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.upsam.tecmov.yourphotos.controller.form.PhotoForm;
@@ -18,6 +22,8 @@ import org.upsam.tecmov.yourphotos.service.PhotoService;
 @Service
 public class PhotoServiceImpl implements PhotoService {
 
+	protected static Logger  logger = Logger.getLogger(PhotoServiceImpl.class); 
+	
 	/**
 	 * Repositorio de fotos
 	 */
@@ -53,11 +59,11 @@ public class PhotoServiceImpl implements PhotoService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<PhotoView> listAll() {
-		Iterable<Photo> iterable = photoRepository.findAll();
+	public Page<PhotoView> listAll(Pageable pageable) {
+		Page<Photo> page = photoRepository.findAll(pageable);
 		List<PhotoView> view = new ArrayList<PhotoView>();
 		PhotoView pview = null;
-		for (Photo photo : iterable) {
+		for (Photo photo : page.getContent()) {
 			pview = new PhotoView();
 			pview.setId(photo.getId());
 			pview.setComment(photo.getComment());
@@ -65,7 +71,7 @@ public class PhotoServiceImpl implements PhotoService {
 			pview.setContentType(photo.getContentType());
 			view.add(pview);
 		}
-		return view;
+		return new PageImpl<PhotoView>(view, pageable, page.getTotalElements());
 	}
 
 	@Override

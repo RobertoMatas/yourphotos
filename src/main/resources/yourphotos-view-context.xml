@@ -6,8 +6,6 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<mvc:annotation-driven />
-
 	<context:component-scan base-package="org.upsam.tecmov" />
 
 	<bean id="viewResolver"
@@ -27,6 +25,15 @@
 	<bean id="jacksonMessageConverter"
 		class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
 
+	<bean id="pListConverter"
+		class="org.upsam.tecmov.yourphotos.spring.converter.PListConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>application/xml+plist</value>
+			</list>
+		</property>
+	</bean>
+
 	<!-- Required for REST services in order to bind the return value to the 
 		ResponseBody. -->
 	<bean
@@ -34,6 +41,7 @@
 		<property name="messageConverters">
 			<list>
 				<ref bean="jacksonMessageConverter" />
+				<ref bean="pListConverter" />				
 			</list>
 		</property>
 	</bean>
@@ -44,5 +52,7 @@
 		<property name="defaultEncoding" value="UTF-8" />
 		<property name="resolveLazily" value="true" />
 	</bean>
+
+	<mvc:annotation-driven />
 	
 </beans>

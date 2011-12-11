@@ -8,7 +8,7 @@
 <title>Listado de fotos</title>
 </head>
 <body>
-<c:forEach items="${photos }" var="p">
+<c:forEach items="${photos.content }" var="p">
 <c:out value="${p.comment }" />
 <c:out value="${p.id }" />
 <c:url var="photoUrl" value="/photos/image">

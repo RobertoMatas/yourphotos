@@ -8,6 +8,9 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -34,6 +37,10 @@ public class PhotoController {
 	 * 
 	 */
 	private static final String UPLOAD_FORM_VIEW = "uploadForm";
+	/**
+	 * 
+	 */
+	private final String PAGE_SIZE = "15";
 
 	/**
 	 * Servicio de fotos
@@ -63,8 +70,10 @@ public class PhotoController {
 	}
 
 	@RequestMapping(value = "/show", method = RequestMethod.GET)
-	public String listPhotos(Model model) {
-		model.addAttribute("photos", photoService.listAll());
+	public String listPhotos(Model model, 
+			@RequestParam(required = false, defaultValue = "0") Integer page,
+			@RequestParam(required = false, defaultValue = PAGE_SIZE) Integer size) {
+		model.addAttribute("photos", photoService.listAll(new PageRequest(page, size, new Sort(Direction.DESC, "date"))));
 		return "photos";
 	}
 
