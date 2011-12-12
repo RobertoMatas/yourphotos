@@ -4,5 +4,5 @@ import org.upsam.tecmov.yourphotos.controller.form.LocationForm;
 
 public interface GoogleRestClient {
 
-	String getPostalCode(LocationForm coordenadas);
+	LocationComponents getLocationComponents(LocationForm coordenadas);
 }

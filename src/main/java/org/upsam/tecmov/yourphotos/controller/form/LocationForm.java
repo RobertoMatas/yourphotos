@@ -2,6 +2,9 @@ package org.upsam.tecmov.yourphotos.controller.form;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+
 public class LocationForm implements Serializable {
 
 	/**
@@ -11,10 +14,14 @@ public class LocationForm implements Serializable {
 	/**
 	 * Latitud
 	 */
+	@NotNull
+	@Digits(integer = 3, fraction = 8)
 	private String lat;
 	/**
 	 * Longitud
 	 */
+	@NotNull
+	@Digits(integer = 3, fraction = 8)
 	private String lng;
 
 	/**

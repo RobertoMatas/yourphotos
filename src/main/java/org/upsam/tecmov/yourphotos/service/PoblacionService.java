@@ -8,4 +8,6 @@ public interface PoblacionService {
 	Page<Poblacion> findByPoblacionSeo(String nameLike, Integer page, Integer size);
 
 	Page<Poblacion> findAll(Integer page, Integer size);
+	
+	Poblacion findByZipCodeAndPoblacion(String zipCode, String poblacion);
 }

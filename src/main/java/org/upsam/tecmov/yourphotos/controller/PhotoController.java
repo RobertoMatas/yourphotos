@@ -40,7 +40,7 @@ public class PhotoController {
 	/**
 	 * 
 	 */
-	private final String PAGE_SIZE = "15";
+	private final Integer PAGE_SIZE = 2;
 
 	/**
 	 * Servicio de fotos
@@ -63,7 +63,7 @@ public class PhotoController {
 		if (! result.hasErrors()) {
 			if (photoService.saveImage(photo)) {
 				status.setComplete();
-				return "redirect:/photos/show";
+				return "redirect:/photos/show?page=0";
 			}
 		}
 		return UPLOAD_FORM_VIEW;
@@ -71,9 +71,8 @@ public class PhotoController {
 
 	@RequestMapping(value = "/show", method = RequestMethod.GET)
 	public String listPhotos(Model model, 
-			@RequestParam(required = false, defaultValue = "0") Integer page,
-			@RequestParam(required = false, defaultValue = PAGE_SIZE) Integer size) {
-		model.addAttribute("photos", photoService.listAll(new PageRequest(page, size, new Sort(Direction.DESC, "date"))));
+			@RequestParam(required = false, defaultValue = "0") Integer page) {
+		model.addAttribute("photos", photoService.listAll(new PageRequest(page, PAGE_SIZE, new Sort(Direction.DESC, "date"))));
 		return "photos";
 	}
 

@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.upsam.tecmov.yourphotos.controller.form.LocationForm;
 import org.upsam.tecmov.yourphotos.service.GoogleRestClient;
+import org.upsam.tecmov.yourphotos.service.LocationComponents;
 
 @Service
 public class GoogleRestClientImpl implements GoogleRestClient {
@@ -42,7 +43,7 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 		this.restTemplate = new RestTemplate();
 	}
 
-	public String getPostalCode(LocationForm coordenadas) {
+	public LocationComponents getLocationComponents(LocationForm coordenadas) {
 		URI uri = null;
 		try {
 			uri = new URI(BASE_GEOCODE_URL + "&latlng=" + coordenadas.getLat() + "," + coordenadas.getLng());
@@ -51,7 +52,8 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 			logger.error("URI para llamar al servicio de Google mal formada", e);
 		}
 		try {
-			return extractZipCode(restTemplate.getForObject(uri, String.class));
+			String[] components = extractZipCodeAndLocality(restTemplate.getForObject(uri, String.class));
+			return new LocationComponents(components[1], components[0]);
 			
 		} catch (JsonParseException e) {
 			logger.error("Error al analizar el Json devuelto por Google", e);
@@ -65,7 +67,10 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 		return null;
 	}
 	
-	private String extractZipCode(String json) throws JsonParseException, JsonMappingException, IOException {
+	private String[] extractZipCodeAndLocality(String json) throws JsonParseException, JsonMappingException, IOException {
+		boolean zipCodeExtracted = false;
+		boolean localityExtracted = false;
+		String[] components = new String[2];
 		JsonNode rootNode = mapper.readValue(new StringReader(json), JsonNode.class);
 		List<JsonNode> addressComponents = rootNode.findValues("address_components");
 		for (JsonNode jsonNode : addressComponents) {
@@ -73,8 +78,14 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 			if (types.isArray()) {
 				for (JsonNode type : types) {
 					if (type.getValueAsText().equalsIgnoreCase("postal_code")) {
-						return jsonNode.findValue("long_name").getTextValue();
+						components[0] = jsonNode.findValue("long_name").getTextValue();
+						zipCodeExtracted = true;
 					}
+					if (type.getValueAsText().contains("locality")) {
+						components[1] = jsonNode.findValue("short_name").getTextValue();
+						localityExtracted = true;
+					}
+					if (localityExtracted && zipCodeExtracted) return components;
 				}
 			}
 		}
