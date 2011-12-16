@@ -22,7 +22,9 @@ import org.upsam.tecmov.yourphotos.service.LocationComponents;
 public class GoogleRestClientImpl implements GoogleRestClient {
 	
 	protected static Logger  logger = Logger.getLogger(GoogleRestClientImpl.class); 
-	
+	/**
+	 * URL de geolocalizacion de Google
+	 */
 	private static final String BASE_GEOCODE_URL = "http://maps.google.com/maps/api/geocode/json?sensor=false";
 	
 	/**
