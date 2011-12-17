@@ -22,8 +22,8 @@ import org.upsam.tecmov.yourphotos.service.PhotoService;
 @Service
 public class PhotoServiceImpl implements PhotoService {
 
-	protected static Logger  logger = Logger.getLogger(PhotoServiceImpl.class); 
-	
+	protected static Logger logger = Logger.getLogger(PhotoServiceImpl.class);
+
 	/**
 	 * Repositorio de fotos
 	 */

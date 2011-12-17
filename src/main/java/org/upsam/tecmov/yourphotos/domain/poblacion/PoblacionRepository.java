@@ -13,4 +13,6 @@ public interface PoblacionRepository extends PagingAndSortingRepository<Poblacio
 	List<Poblacion> findByCodPostalAndPoblacionSeoLike(String codPostal, String poblacionSeo);
 	
 	List<Poblacion> findByCodPostal(String codPostal);
+	
+	Page<Poblacion> findByNumSuggestionsGreaterThan(Integer numSuggestions, Pageable pageable);
 }

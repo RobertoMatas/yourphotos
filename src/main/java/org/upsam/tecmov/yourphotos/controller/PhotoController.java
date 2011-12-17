@@ -58,9 +58,8 @@ public class PhotoController {
 	}
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public String handleFormUpload(@Valid @ModelAttribute("photo") PhotoForm photo,
-			BindingResult result, SessionStatus status) throws IOException {
-		if (! result.hasErrors()) {
+	public String handleFormUpload(@Valid @ModelAttribute("photo") PhotoForm photo, BindingResult result, SessionStatus status) throws IOException {
+		if (!result.hasErrors()) {
 			if (photoService.saveImage(photo)) {
 				status.setComplete();
 				return "redirect:/photos/show?page=0";
@@ -70,8 +69,7 @@ public class PhotoController {
 	}
 
 	@RequestMapping(value = "/show", method = RequestMethod.GET)
-	public String listPhotos(Model model, 
-			@RequestParam(required = false, defaultValue = "0") Integer page) {
+	public String listPhotos(Model model, @RequestParam(required = false, defaultValue = "0") Integer page) {
 		model.addAttribute("photos", photoService.listAll(new PageRequest(page, PAGE_SIZE, new Sort(Direction.DESC, "date"))));
 		return "photos";
 	}
@@ -83,7 +81,7 @@ public class PhotoController {
 		FileCopyUtils.copy(pv.getPhoto(), response.getOutputStream());
 	}
 
-	@ExceptionHandler({IOException.class, MaxUploadSizeExceededException.class})
+	@ExceptionHandler({ IOException.class, MaxUploadSizeExceededException.class })
 	public ModelAndView handleUploadException(Exception ex, HttpServletRequest request, HttpSession session) {
 		PhotoForm model = (PhotoForm) WebUtils.getOrCreateSessionAttribute(session, "photo", PhotoForm.class);
 		request.setAttribute("error", ex.getLocalizedMessage());

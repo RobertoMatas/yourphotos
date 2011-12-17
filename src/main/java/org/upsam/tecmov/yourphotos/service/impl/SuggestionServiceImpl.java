@@ -3,6 +3,7 @@ package org.upsam.tecmov.yourphotos.service.impl;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +15,14 @@ import org.upsam.tecmov.yourphotos.service.GoogleRestClient;
 import org.upsam.tecmov.yourphotos.service.LocationComponents;
 import org.upsam.tecmov.yourphotos.service.PoblacionService;
 import org.upsam.tecmov.yourphotos.service.SuggestionService;
+import org.upsam.tecmov.yourphotos.service.ex.ServiceException;
 
 import uk.me.jstott.coordconv.LatitudeLongitude;
 import uk.me.jstott.sun.Sun;
 
 @Service
 public class SuggestionServiceImpl implements SuggestionService {
+	protected static Logger logger = Logger.getLogger(SuggestionServiceImpl.class);
 	/**
 	 * 
 	 */
@@ -49,9 +52,12 @@ public class SuggestionServiceImpl implements SuggestionService {
 
 	@Override
 	@Transactional
-	public void registerSuggestion(SuggestionForm form) {
+	public void registerSuggestion(SuggestionForm form) throws ServiceException {
 		LocationComponents lc = googleRestClient.getLocationComponents(form);
 		Poblacion poblacion = poblacionService.findByZipCodeAndPoblacion(lc.zipCode, lc.locality);
+		if (poblacion == null) {
+			throw new ServiceException("No es posible registrar la sugerencia. No existe población para " + lc);
+		}
 		Suggestion suggestion = new Suggestion();
 		Calendar now = Calendar.getInstance();
 		suggestion.setDate(now.getTime());
@@ -65,6 +71,8 @@ public class SuggestionServiceImpl implements SuggestionService {
 		System.out.println("Anochecer: " + Sun.eveningCivilTwilightTime(now, new LatitudeLongitude(Double.parseDouble(form.getLat()), Double.parseDouble(form.getLng())), TimeZone.getDefault(), true));
 		suggestion.setPhotoType(null); // TODO
 		suggestion.setPoblacion(poblacion);
+		poblacion.addSuggestion(suggestion);
+		logger.debug("Población encontrada: " + poblacion);
 		suggestionRepository.save(suggestion);
 	}
 

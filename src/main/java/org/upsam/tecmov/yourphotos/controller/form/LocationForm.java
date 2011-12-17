@@ -25,6 +25,23 @@ public class LocationForm implements Serializable {
 	private String lng;
 
 	/**
+	 * @param lat
+	 * @param lng
+	 */
+	public LocationForm(String lat, String lng) {
+		super();
+		this.lat = lat;
+		this.lng = lng;
+	}
+
+	/**
+	 * 
+	 */
+	public LocationForm() {
+		super();
+	}
+
+	/**
 	 * @return the lat
 	 */
 	public String getLat() {

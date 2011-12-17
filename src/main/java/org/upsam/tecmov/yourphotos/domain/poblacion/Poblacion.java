@@ -1,9 +1,13 @@
 package org.upsam.tecmov.yourphotos.domain.poblacion;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+
+import org.upsam.tecmov.yourphotos.domain.suggestion.Suggestion;
 
 @Entity
 public class Poblacion {
@@ -42,8 +46,20 @@ public class Poblacion {
 	/**
 	 * Número de fotos que se han hecho en esta zona
 	 */
-	@Column(name = "num_fotos")
-	private Integer numFotos;
+	@Column(name = "num_suggestions")
+	private Integer numSuggestions;
+	/**
+	 * Fecha de la última sugerencia
+	 */
+	@Column(name = "last_suggestion")
+	private Date lastSuggestion;
+	/**
+	 * 
+	 */
+	public Poblacion() {
+		super();
+		this.numSuggestions = 0;
+	}
 	/**
 	 * @return the id
 	 */
@@ -128,17 +144,34 @@ public class Poblacion {
 	public void setLongitud(String longitud) {
 		this.longitud = longitud;
 	}
+
 	/**
-	 * @return the numFotos
+	 * @return the numSuggestions
 	 */
-	public Integer getNumFotos() {
-		return numFotos;
+	public Integer getNumSuggestions() {
+		return numSuggestions;
 	}
 	/**
-	 * @param numFotos the numFotos to set
+	 * @return the lastSuggestion
 	 */
-	public void setNumFotos(Integer numFotos) {
-		this.numFotos = numFotos;
+	public Date getLastSuggestion() {
+		return lastSuggestion;
+	}
+	/**
+	 * @param numSuggestions the numSuggestions to set
+	 */
+	public void addSuggestion(Suggestion suggestion) {
+		this.numSuggestions ++;
+		this.lastSuggestion = suggestion.getDate();
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.format(
+				"Poblacion [id=%s, poblacion=%s, codPostal=%s, numSuggestions=%s]",
+				id, poblacion, codPostal, numSuggestions);
 	}
 	
 }

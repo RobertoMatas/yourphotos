@@ -20,13 +20,17 @@ import org.upsam.tecmov.yourphotos.service.LocationComponents;
 
 @Service
 public class GoogleRestClientImpl implements GoogleRestClient {
-	
-	protected static Logger  logger = Logger.getLogger(GoogleRestClientImpl.class); 
+
+	private static final String LATLNG_PARAM = "&latlng=";
+
+	protected static Logger logger = Logger.getLogger(GoogleRestClientImpl.class);
 	/**
 	 * URL de geolocalizacion de Google
 	 */
 	private static final String BASE_GEOCODE_URL = "http://maps.google.com/maps/api/geocode/json?sensor=false";
-	
+
+	private static final String BASE_DIRECTIONS_URL = "http://maps.google.com/maps/api/directions/json?sensor=false&mode=walking";
+
 	/**
 	 * Mapper de Json a Objetos
 	 */
@@ -45,18 +49,19 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 		this.restTemplate = new RestTemplate();
 	}
 
+	@Override
 	public LocationComponents getLocationComponents(LocationForm coordenadas) {
 		URI uri = null;
 		try {
-			uri = new URI(BASE_GEOCODE_URL + "&latlng=" + coordenadas.getLat() + "," + coordenadas.getLng());
-			
+			uri = new URI(BASE_GEOCODE_URL + LATLNG_PARAM + coordenadas.getLat() + "," + coordenadas.getLng());
+
 		} catch (URISyntaxException e) {
 			logger.error("URI para llamar al servicio de Google mal formada", e);
 		}
 		try {
 			String[] components = extractZipCodeAndLocality(restTemplate.getForObject(uri, String.class));
 			return new LocationComponents(components[1], components[0]);
-			
+
 		} catch (JsonParseException e) {
 			logger.error("Error al analizar el Json devuelto por Google", e);
 		} catch (JsonMappingException e) {
@@ -68,7 +73,42 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Integer getDistance(LocationForm origin, LocationForm destination) {
+		URI uri = null;
+		try {
+			uri = new URI(BASE_DIRECTIONS_URL + "&origin=" + origin.getLat() + "," + origin.getLng() + "&destination=" + destination.getLat() + "," + destination.getLng());
+
+		} catch (URISyntaxException e) {
+			logger.error("URI para llamar al servicio de Google mal formada", e);
+		}
+		try {
+			return extractDistance(restTemplate.getForObject(uri, String.class));
+
+		} catch (JsonParseException e) {
+			logger.error("Error al analizar el Json devuelto por Google", e);
+		} catch (JsonMappingException e) {
+			logger.error("Error al analizar el Json devuelto por Google", e);
+		} catch (RestClientException e) {
+			logger.error("Error al llamar al servicio de Google", e);
+		} catch (IOException e) {
+			logger.error("Error al analizar el Json devuelto por Google", e);
+		}
+		return null;
+	}
+
+	private Integer extractDistance(String json) throws JsonParseException, JsonMappingException, IOException {
+		JsonNode rootNode = mapper.readValue(new StringReader(json), JsonNode.class);
+		JsonNode legs = rootNode.findValue("legs");
+		JsonNode distance = legs.findValue("distance");
+		JsonNode value = distance.findValue("value");
+		return value.getIntValue();
+	}
+
 	private String[] extractZipCodeAndLocality(String json) throws JsonParseException, JsonMappingException, IOException {
 		boolean zipCodeExtracted = false;
 		boolean localityExtracted = false;
@@ -87,7 +127,8 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 						components[1] = jsonNode.findValue("short_name").getTextValue();
 						localityExtracted = true;
 					}
-					if (localityExtracted && zipCodeExtracted) return components;
+					if (localityExtracted && zipCodeExtracted)
+						return components;
 				}
 			}
 		}

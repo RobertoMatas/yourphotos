@@ -20,4 +20,14 @@ public class LocationComponents {
 		this.zipCode = zipCode;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.format("[locality=%s, zipCode=%s]", locality, zipCode);
+	}
+
 }
