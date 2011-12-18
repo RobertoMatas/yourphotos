@@ -26,6 +26,14 @@ public class PoblacionWithDetailsView implements Serializable {
 	 */
 	private Integer categoria;
 	/**
+	 * Latitud
+	 */
+	private String lat;
+	/**
+	 * Longitud
+	 */
+	private String lng;
+	/**
 	 * Información adicional
 	 */
 	private DetailsView details;
@@ -36,13 +44,16 @@ public class PoblacionWithDetailsView implements Serializable {
 	 * @param categoria
 	 * @param details
 	 */
-	public PoblacionWithDetailsView(String poblacion, String provincia, Integer distancia, Integer categoria, DetailsView details) {
+	public PoblacionWithDetailsView(String poblacion, String provincia, Integer distancia,
+			Integer categoria, String lat, String lng, DetailsView details) {
 		super();
 		this.poblacion = poblacion;
 		this.provincia = provincia;
 		this.distancia = distancia;
-		this.details = details;
 		this.categoria = categoria;
+		this.lat = lat;
+		this.lng = lng;
+		this.details = details;
 	}
 
 	/**
@@ -71,6 +82,20 @@ public class PoblacionWithDetailsView implements Serializable {
 	 */
 	public Integer getCategoria() {
 		return categoria;
+	}
+
+	/**
+	 * @return the lat
+	 */
+	public String getLat() {
+		return lat;
+	}
+
+	/**
+	 * @return the lng
+	 */
+	public String getLng() {
+		return lng;
 	}
 
 	/**

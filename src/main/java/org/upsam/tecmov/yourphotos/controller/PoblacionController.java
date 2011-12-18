@@ -39,7 +39,7 @@ public class PoblacionController {
 
 	@RequestMapping(value = "/poblaciones", method = RequestMethod.GET)
 	@ResponseBody
-	public Page<PoblacionWithDetailsView> getPoblaciones(LocationForm form, BindingResult result, 
+	public Page<PoblacionWithDetailsView> getPoblaciones(LocationForm form, BindingResult result,
 			@RequestParam(required = false, defaultValue = "0") Integer page,
 			@RequestParam(required = false, defaultValue = PAGE_SIZE) Integer size,
 			@RequestParam(required = false, defaultValue = "tiempo") InfoOrder order) {
@@ -52,7 +52,9 @@ public class PoblacionController {
 
 	@RequestMapping(value = "/poblaciones/buscador", method = RequestMethod.GET)
 	@ResponseBody
-	public Page<Poblacion> getPoblacionesLike(@RequestParam(required = false, defaultValue = "0") Integer page, @RequestParam(required = false, defaultValue = PAGE_SIZE) Integer size,
+	public Page<Poblacion> getPoblacionesLike(
+			@RequestParam(required = false, defaultValue = "0") Integer page,
+			@RequestParam(required = false, defaultValue = PAGE_SIZE) Integer size,
 			@RequestParam String nameLike) {
 		return poblacionService.findByPoblacionSeo(nameLike, page, size);
 	}

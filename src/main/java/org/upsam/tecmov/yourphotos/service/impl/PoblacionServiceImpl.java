@@ -61,7 +61,8 @@ public class PoblacionServiceImpl implements PoblacionService {
 	 * @param suggestionRepository
 	 */
 	@Autowired
-	public PoblacionServiceImpl(PoblacionRepository poblacionRepository, SuggestionRepository suggestionRepository, GoogleRestClient googleRestClient) {
+	public PoblacionServiceImpl(PoblacionRepository poblacionRepository,
+			SuggestionRepository suggestionRepository, GoogleRestClient googleRestClient) {
 		this.poblacionRepository = poblacionRepository;
 		this.suggestionRepository = suggestionRepository;
 		this.googleRestClient = googleRestClient;
@@ -69,7 +70,9 @@ public class PoblacionServiceImpl implements PoblacionService {
 
 	@Override
 	public Page<Poblacion> findByPoblacionSeo(String nameLike, Integer page, Integer size) {
-		return poblacionRepository.findByPoblacionSeoLike("%" + DefaultNormalizer.normalize(nameLike) + "%", new PageRequest(page, size, SORT_DEFAULT));
+		return poblacionRepository.findByPoblacionSeoLike(
+				"%" + DefaultNormalizer.normalize(nameLike) + "%", new PageRequest(page, size,
+						SORT_DEFAULT));
 	}
 
 	@Override
@@ -89,7 +92,8 @@ public class PoblacionServiceImpl implements PoblacionService {
 
 		// si hay varios resultados intentamos una búsqueda añadiendo el filtro
 		// por nombre de población
-		List<Poblacion> poblaciones2 = poblacionRepository.findByCodPostalAndPoblacionSeoLike(zipCode, "%" + DefaultNormalizer.normalize(poblacion) + "%");
+		List<Poblacion> poblaciones2 = poblacionRepository.findByCodPostalAndPoblacionSeoLike(
+				zipCode, "%" + DefaultNormalizer.normalize(poblacion) + "%");
 		if (poblaciones2 != null && !poblaciones2.isEmpty()) {
 			if (poblaciones2.size() > 1) {
 				logger.warn("Existen varias poblaciones -> " + poblaciones2);
@@ -103,25 +107,37 @@ public class PoblacionServiceImpl implements PoblacionService {
 	}
 
 	@Override
-	public Page<PoblacionWithDetailsView> findByPoblacionWithSuggestions(LocationForm coordenadas, Integer page, Integer size, InfoOrder order) {
+	public Page<PoblacionWithDetailsView> findByPoblacionWithSuggestions(LocationForm coordenadas,
+			Integer page, Integer size, InfoOrder order) {
 		Page<Poblacion> poblaciones = null;
 		if (order.equals(InfoOrder.tiempo)) {
-			PageRequest pageable = new PageRequest(page, size, new Sort(Direction.DESC, "lastSuggestion"));
-			poblaciones = poblacionRepository.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0, coordenadas.getCategory(), pageable);
-			return new PageImpl<PoblacionWithDetailsView>(toView(coordenadas, poblaciones.getContent()), pageable, poblaciones.getTotalElements());
+			PageRequest pageable = new PageRequest(page, size, new Sort(Direction.DESC,
+					"lastSuggestion"));
+			poblaciones = poblacionRepository
+					.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0,
+							coordenadas.getCategory(), pageable);
+			return new PageImpl<PoblacionWithDetailsView>(toView(coordenadas,
+					poblaciones.getContent()), pageable, poblaciones.getTotalElements());
 
 		} else {
-			poblaciones = poblacionRepository.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0, coordenadas.getCategory(), null);
+			poblaciones = poblacionRepository
+					.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0,
+							coordenadas.getCategory(), null);
 			List<PoblacionWithDetailsView> view = toView(coordenadas, poblaciones.getContent());
 			reorder(order, view);
-			int fromIndex = page * size;
-			int toIndex = fromIndex + size > view.size() ? view.size() : fromIndex + size;
-			return new PageImpl<PoblacionWithDetailsView>(view.subList(fromIndex, toIndex), new PageRequest(page, size), view.size());
+			int fromIndex = page != null && size != null ? page * size : 0;
+			int toIndex = (page == null && size == null) || (fromIndex + size) > view.size() ? view
+					.size() : fromIndex + size;
+			PageRequest pageable = (page == null && size == null) ? null : new PageRequest(page, size);
+			return new PageImpl<PoblacionWithDetailsView>(view.subList(fromIndex, toIndex),
+					pageable, view.size());
 		}
 	}
 
-	private List<PoblacionWithDetailsView> toView(LocationForm coordenadas, List<Poblacion> listPoblaciones) {
-		List<PoblacionWithDetailsView> view = new ArrayList<PoblacionWithDetailsView>(listPoblaciones.size());
+	private List<PoblacionWithDetailsView> toView(LocationForm coordenadas,
+			List<Poblacion> listPoblaciones) {
+		List<PoblacionWithDetailsView> view = new ArrayList<PoblacionWithDetailsView>(
+				listPoblaciones.size());
 		for (Poblacion poblacion : listPoblaciones) {
 			view.add(toView(coordenadas, poblacion));
 		}
@@ -149,16 +165,21 @@ public class PoblacionServiceImpl implements PoblacionService {
 		if (first) {
 			direction = Direction.ASC;
 		}
-		Page<Suggestion> suggestions = suggestionRepository.findByPoblacion(poblacion, new PageRequest(0, 1, new Sort(direction, "date")));
+		Page<Suggestion> suggestions = suggestionRepository.findByPoblacion(poblacion,
+				new PageRequest(0, 1, new Sort(direction, "date")));
 		return suggestions.getContent().get(0);
 	}
 
 	private PoblacionWithDetailsView toView(LocationForm coordenadas, Poblacion poblacion) {
 		Suggestion first = getSuggestion(poblacion, true);
 		Suggestion last = getSuggestion(poblacion, false);
-		Integer distance = googleRestClient.getDistance(coordenadas, new LocationForm(poblacion.getLatitud(), poblacion.getLongitud()));
+		Integer distance = googleRestClient.getDistance(coordenadas,
+				new LocationForm(poblacion.getLatitud(), poblacion.getLongitud()));
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		return new PoblacionWithDetailsView(poblacion.getPoblacion(), poblacion.getProvincia().getNombre(), distance, poblacion.getCategory(), new DetailsView(poblacion.getNumSuggestions(),
-				df.format(first.getDate()), df.format(last.getDate()), first.getPhotoType().toString(), last.getPhotoType().toString()));
+		return new PoblacionWithDetailsView(poblacion.getPoblacion(), poblacion.getProvincia()
+				.getNombre(), distance, poblacion.getCategory(), poblacion.getLatitud(),
+				poblacion.getLongitud(), new DetailsView(poblacion.getNumSuggestions(),
+						df.format(first.getDate()), df.format(last.getDate()), first.getPhotoType()
+								.toString(), last.getPhotoType().toString()));
 	}
 }

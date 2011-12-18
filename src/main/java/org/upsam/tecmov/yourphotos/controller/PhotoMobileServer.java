@@ -1,16 +1,25 @@
 package org.upsam.tecmov.yourphotos.controller;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.upsam.tecmov.yourphotos.controller.form.LocationForm;
 import org.upsam.tecmov.yourphotos.controller.form.SuggestionForm;
+import org.upsam.tecmov.yourphotos.controller.view.CenterView;
+import org.upsam.tecmov.yourphotos.controller.view.InfoOrder;
+import org.upsam.tecmov.yourphotos.controller.view.MapsView;
+import org.upsam.tecmov.yourphotos.controller.view.PoblacionWithDetailsView;
 import org.upsam.tecmov.yourphotos.domain.poblacion.Poblacion;
 import org.upsam.tecmov.yourphotos.service.GoogleRestClient;
 import org.upsam.tecmov.yourphotos.service.LocationComponents;
@@ -73,5 +82,26 @@ public class PhotoMobileServer {
 		} else {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
+	}
+	
+	@RequestMapping("/maps/static")
+	public void getMapStaticWithPoblaciones(LocationForm form, HttpServletResponse response) throws IOException {
+		response.setContentType("image/png");
+		Page<PoblacionWithDetailsView> page = poblacionService.findByPoblacionWithSuggestions(form, null, null, InfoOrder.categoria);
+		FileCopyUtils.copy(client.getMap(form, page.getContent()), response.getOutputStream());
+	}
+	
+	@RequestMapping("/maps")
+	@ResponseBody
+	public MapsView getMapWithPoblaciones(LocationForm form, Model model) {
+		Page<PoblacionWithDetailsView> page = poblacionService.findByPoblacionWithSuggestions(form, null, null, InfoOrder.categoria);
+		return new MapsView(new CenterView(form.getLat(), form.getLng()), page.getContent());
+	}
+	
+	@RequestMapping("/maps/view")
+	public String getMapWithPoblacionesView(LocationForm form, Model model) {
+		model.addAttribute("centerLatitude", form.getLat());
+		model.addAttribute("centerLongitude", form.getLng());
+		return "map";
 	}
 }
