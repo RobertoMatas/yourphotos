@@ -41,8 +41,8 @@ public class PoblacionWithDetailsView implements Serializable {
 		this.poblacion = poblacion;
 		this.provincia = provincia;
 		this.distancia = distancia;
-		this.categoria = categoria;
 		this.details = details;
+		this.categoria = categoria;
 	}
 
 	/**

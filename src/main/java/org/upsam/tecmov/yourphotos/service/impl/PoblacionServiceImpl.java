@@ -3,6 +3,8 @@ package org.upsam.tecmov.yourphotos.service.impl;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -16,7 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.upsam.tecmov.yourphotos.controller.form.LocationForm;
 import org.upsam.tecmov.yourphotos.controller.view.DetailsView;
+import org.upsam.tecmov.yourphotos.controller.view.InfoOrder;
 import org.upsam.tecmov.yourphotos.controller.view.PoblacionWithDetailsView;
+import org.upsam.tecmov.yourphotos.controller.view.comparator.CategoriaComparator;
+import org.upsam.tecmov.yourphotos.controller.view.comparator.DistanciaComparator;
 import org.upsam.tecmov.yourphotos.domain.poblacion.Poblacion;
 import org.upsam.tecmov.yourphotos.domain.poblacion.PoblacionRepository;
 import org.upsam.tecmov.yourphotos.domain.suggestion.Suggestion;
@@ -29,7 +34,11 @@ import org.upsam.tecmov.yourphotos.utils.DefaultNormalizer;
 @Transactional(readOnly = true)
 public class PoblacionServiceImpl implements PoblacionService {
 
+	private static final CategoriaComparator CAT_COMPARATOR = new CategoriaComparator();
+
 	private static final Sort SORT_DEFAULT = new Sort("provincia.nombreSeo", "poblacionSeo");
+
+	private static final Comparator<? super PoblacionWithDetailsView> DIST_COMPARATOR = new DistanciaComparator();
 
 	protected static Logger logger = Logger.getLogger(PoblacionServiceImpl.class);
 
@@ -94,18 +103,45 @@ public class PoblacionServiceImpl implements PoblacionService {
 	}
 
 	@Override
-	public Page<PoblacionWithDetailsView> findByPoblacionWithSuggestions(LocationForm coordenadas, Integer page, Integer size) {
-		PageRequest pageable = new PageRequest(page, size, SORT_DEFAULT);
-		Page<Poblacion> poblaciones = poblacionRepository.findByNumSuggestionsGreaterThan(0, pageable);
-		List<PoblacionWithDetailsView> view = new ArrayList<PoblacionWithDetailsView>(poblaciones.getNumberOfElements());
-		Suggestion first, last = null;
-		for (Poblacion poblacion : poblaciones) {
-			first = getSuggestion(poblacion, true);
-			last = getSuggestion(poblacion, false);
-			view.add(toView(coordenadas, first, last, poblacion));
-		}
+	public Page<PoblacionWithDetailsView> findByPoblacionWithSuggestions(LocationForm coordenadas, Integer page, Integer size, InfoOrder order) {
+		Page<Poblacion> poblaciones = null;
+		if (order.equals(InfoOrder.tiempo)) {
+			PageRequest pageable = new PageRequest(page, size, new Sort(Direction.DESC, "lastSuggestion"));
+			poblaciones = poblacionRepository.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0, coordenadas.getCategory(), pageable);
+			return new PageImpl<PoblacionWithDetailsView>(toView(coordenadas, poblaciones.getContent()), pageable, poblaciones.getTotalElements());
 
-		return new PageImpl<PoblacionWithDetailsView>(view, pageable, poblaciones.getTotalElements());
+		} else {
+			poblaciones = poblacionRepository.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0, coordenadas.getCategory(), null);
+			List<PoblacionWithDetailsView> view = toView(coordenadas, poblaciones.getContent());
+			reorder(order, view);
+			int fromIndex = page * size;
+			int toIndex = fromIndex + size > view.size() ? view.size() : fromIndex + size;
+			return new PageImpl<PoblacionWithDetailsView>(view.subList(fromIndex, toIndex), new PageRequest(page, size), view.size());
+		}
+	}
+
+	private List<PoblacionWithDetailsView> toView(LocationForm coordenadas, List<Poblacion> listPoblaciones) {
+		List<PoblacionWithDetailsView> view = new ArrayList<PoblacionWithDetailsView>(listPoblaciones.size());
+		for (Poblacion poblacion : listPoblaciones) {
+			view.add(toView(coordenadas, poblacion));
+		}
+		return view;
+	}
+
+	private void reorder(InfoOrder order, List<PoblacionWithDetailsView> view) {
+		if (!order.equals(InfoOrder.tiempo)) {
+			switch (order) {
+			case categoria:
+				Collections.sort(view, Collections.reverseOrder(CAT_COMPARATOR));
+				break;
+			case distancia:
+				Collections.sort(view, DIST_COMPARATOR);
+				break;
+
+			default:
+				break;
+			}
+		}
 	}
 
 	private Suggestion getSuggestion(Poblacion poblacion, boolean first) {
@@ -117,10 +153,12 @@ public class PoblacionServiceImpl implements PoblacionService {
 		return suggestions.getContent().get(0);
 	}
 
-	private PoblacionWithDetailsView toView(LocationForm coordenadas, Suggestion first, Suggestion last, Poblacion poblacion) {
+	private PoblacionWithDetailsView toView(LocationForm coordenadas, Poblacion poblacion) {
+		Suggestion first = getSuggestion(poblacion, true);
+		Suggestion last = getSuggestion(poblacion, false);
 		Integer distance = googleRestClient.getDistance(coordenadas, new LocationForm(poblacion.getLatitud(), poblacion.getLongitud()));
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		return new PoblacionWithDetailsView(poblacion.getPoblacion(), poblacion.getProvincia().getNombre(), distance, 0, new DetailsView(poblacion.getNumSuggestions(), df.format(first.getDate()),
-				df.format(last.getDate()), "", ""));
+		return new PoblacionWithDetailsView(poblacion.getPoblacion(), poblacion.getProvincia().getNombre(), distance, poblacion.getCategory(), new DetailsView(poblacion.getNumSuggestions(),
+				df.format(first.getDate()), df.format(last.getDate()), first.getPhotoType().toString(), last.getPhotoType().toString()));
 	}
 }

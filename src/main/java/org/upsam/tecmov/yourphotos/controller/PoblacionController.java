@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.upsam.tecmov.yourphotos.controller.form.LocationForm;
+import org.upsam.tecmov.yourphotos.controller.view.InfoOrder;
 import org.upsam.tecmov.yourphotos.controller.view.PoblacionWithDetailsView;
 import org.upsam.tecmov.yourphotos.domain.poblacion.Poblacion;
 import org.upsam.tecmov.yourphotos.service.PoblacionService;
@@ -38,11 +39,13 @@ public class PoblacionController {
 
 	@RequestMapping(value = "/poblaciones", method = RequestMethod.GET)
 	@ResponseBody
-	public Page<PoblacionWithDetailsView> getPoblaciones(LocationForm form, BindingResult result, @RequestParam(required = false, defaultValue = "0") Integer page,
-			@RequestParam(required = false, defaultValue = PAGE_SIZE) Integer size) {
+	public Page<PoblacionWithDetailsView> getPoblaciones(LocationForm form, BindingResult result, 
+			@RequestParam(required = false, defaultValue = "0") Integer page,
+			@RequestParam(required = false, defaultValue = PAGE_SIZE) Integer size,
+			@RequestParam(required = false, defaultValue = "tiempo") InfoOrder order) {
 		validator.validate(form, result);
 		if (!result.hasErrors()) {
-			return poblacionService.findByPoblacionWithSuggestions(form, page, size);
+			return poblacionService.findByPoblacionWithSuggestions(form, page, size, order);
 		}
 		return null;
 	}

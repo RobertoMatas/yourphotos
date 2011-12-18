@@ -23,6 +23,10 @@ public class LocationForm implements Serializable {
 	@NotNull
 	@Digits(integer = 3, fraction = 8)
 	private String lng;
+	/**
+	 * Categoría mínima de visualización
+	 */
+	private Integer category;
 
 	/**
 	 * @param lat
@@ -32,6 +36,7 @@ public class LocationForm implements Serializable {
 		super();
 		this.lat = lat;
 		this.lng = lng;
+		this.category = -1;
 	}
 
 	/**
@@ -39,6 +44,7 @@ public class LocationForm implements Serializable {
 	 */
 	public LocationForm() {
 		super();
+		this.category = -1;		
 	}
 
 	/**
@@ -69,6 +75,20 @@ public class LocationForm implements Serializable {
 	 */
 	public void setLng(String lng) {
 		this.lng = lng;
+	}
+
+	/**
+	 * @return the category
+	 */
+	public Integer getCategory() {
+		return category;
+	}
+
+	/**
+	 * @param category the category to set
+	 */
+	public void setCategory(Integer category) {
+		this.category = category != null && category <=5 ? category - 1 : -1;
 	}
 
 }
