@@ -22,7 +22,7 @@
 	var mapData;
 	var map;
 	q(document).ready(function() {
-		q.getJSON('http://yourphotos.herokuapp.com/yourphotos/maps?lat=40.4177664&lng=-3.5271783', function(data) {
+		q.getJSON('http://yourphotos.herokuapp.com/maps?lat=40.4177664&lng=-3.5271783', function(data) {
 			mapData = data;
 		    console.log(mapData);
 		    map.setCenter(new google.maps.LatLng(mapData.center.lat, mapData.center.lng));
