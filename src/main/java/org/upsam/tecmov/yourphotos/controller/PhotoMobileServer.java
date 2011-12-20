@@ -1,20 +1,27 @@
 package org.upsam.tecmov.yourphotos.controller;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.upsam.tecmov.yourphotos.controller.form.LocationForm;
+import org.upsam.tecmov.yourphotos.controller.form.ManualSuggestionForm;
 import org.upsam.tecmov.yourphotos.controller.form.SuggestionForm;
 import org.upsam.tecmov.yourphotos.controller.view.CenterView;
 import org.upsam.tecmov.yourphotos.controller.view.InfoOrder;
@@ -59,6 +66,13 @@ public class PhotoMobileServer {
 		this.validator = validator;
 	}
 
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		DateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHHmmss");
+		dateFormat.setLenient(false);
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
+	}
+	
 	@RequestMapping("/iamhere")
 	@ResponseBody
 	public Poblacion photoTaken(LocationForm form) {
@@ -68,6 +82,16 @@ public class PhotoMobileServer {
 	
 	@RequestMapping("/suggest")
 	public void suggest(SuggestionForm form, BindingResult result, HttpServletResponse response) {
+		registerSuggestion(form, result, response);
+	}
+	
+	@RequestMapping("/suggest/manual")
+	public void manualSuggest(ManualSuggestionForm form, BindingResult result, HttpServletResponse response) {
+		registerSuggestion(form, result, response);
+	}
+	
+	private void registerSuggestion(SuggestionForm form, BindingResult result,
+			HttpServletResponse response) {
 		validator.validate(form, result);
 		if (! result.hasErrors()) {
 			try {

@@ -9,6 +9,21 @@ public class SuggestionForm extends LocationForm {
 	/**
 	 * 
 	 */
+	public SuggestionForm() {
+		super();
+	}
+
+	/**
+	 * @param lat
+	 * @param lng
+	 */
+	public SuggestionForm(String lat, String lng) {
+		super(lat, lng);
+	}
+
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 5527025961938892164L;
 	/**
 	 * Tipo de foto según lugar: Naturaleza / Urbana

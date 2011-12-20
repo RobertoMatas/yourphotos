@@ -25,6 +25,7 @@ public class LocationForm implements Serializable {
 	private String lng;
 	/**
 	 * Categoría mínima de visualización
+	 * Si el cliente no establece una, no se aplica el filtro
 	 */
 	private Integer category;
 

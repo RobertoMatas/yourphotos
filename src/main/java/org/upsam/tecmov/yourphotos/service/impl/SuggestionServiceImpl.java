@@ -1,6 +1,7 @@
 package org.upsam.tecmov.yourphotos.service.impl;
 
-import java.util.Arrays;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -8,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.upsam.tecmov.yourphotos.controller.form.ManualSuggestionForm;
 import org.upsam.tecmov.yourphotos.controller.form.SuggestionForm;
 import org.upsam.tecmov.yourphotos.domain.poblacion.Poblacion;
 import org.upsam.tecmov.yourphotos.domain.suggestion.PhotoType;
@@ -73,10 +75,13 @@ public class SuggestionServiceImpl implements SuggestionService {
 		logger.debug("Población encontrada: " + poblacion);
 		suggestionRepository.save(suggestion);
 	}
-
+	/*
 	private PhotoType getPhotoType(SuggestionForm form) {
-		PhotoType type = PhotoType.OTRA;
+		PhotoType type = PhotoType.NOCTURNA;
 		Calendar now = Calendar.getInstance();
+		if (form instanceof ManualSuggestionForm) {
+			now.setTime(((ManualSuggestionForm)form).getManualDate());
+		}
 		logger.debug("TimeZone default is: " + TIMEZONE_DEFAULT);
 		LatitudeLongitude latlng = new LatitudeLongitude(Double.parseDouble(form.getLat()), Double.parseDouble(form.getLng()));
 		Time[] hoursOfEvents = { Sun.sunriseTime(now, latlng, TIMEZONE_DEFAULT, true), Sun.sunsetTime(now, latlng, TIMEZONE_DEFAULT, true),
@@ -103,6 +108,56 @@ public class SuggestionServiceImpl implements SuggestionService {
 		cal.set(Calendar.MINUTE, amanecer.getMinutes() + minutes);
 		cal.set(Calendar.HOUR_OF_DAY, amanecer.getHours());
 		return cal;
+	}
+	*/
+	private PhotoType getPhotoType(SuggestionForm form) {
+		PhotoType type = PhotoType.NOCTURNA;
+		Calendar now = Calendar.getInstance();
+		logger.debug("TimeZone default is: " + TIMEZONE_DEFAULT);
+		// si es una sugerencia manual, la fecha debe estar indicada
+		if (form instanceof ManualSuggestionForm) {
+			now.setTime(((ManualSuggestionForm)form).getManualDate());
+		}
+		LatitudeLongitude latlng = new LatitudeLongitude(Double.parseDouble(form.getLat()), Double.parseDouble(form.getLng()));
+		Calendar sunriseTime = toCalendar(Sun.sunriseTime(now, latlng, TIMEZONE_DEFAULT, true));
+		Calendar sunsetTime = toCalendar(Sun.sunsetTime(now, latlng, TIMEZONE_DEFAULT, true));
+		Calendar twilightTime = toCalendar(Sun.eveningCivilTwilightTime(now, latlng, TIMEZONE_DEFAULT, true));
+		if (logger.isDebugEnabled()) {
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			logger.debug("Amanecer: " + dateFormat.format(sunriseTime.getTime()));
+			logger.debug("Atardecer: " + dateFormat.format(sunsetTime.getTime()));
+			logger.debug("Anochecer: " + dateFormat.format(twilightTime.getTime()));
+			logger.debug("Sugerencia: " + dateFormat.format(now.getTime()));
+		}
+		// amancer si now entre hora_amancer -1 y hora_amanecer
+		if (now.after(oneHourMinus(sunriseTime)) && now.before(sunriseTime)) {
+			type = PhotoType.AMANECER;
+		// diurna si now entre hora_amancer y hora_atardecer - 1
+		} else if (now.after(sunriseTime) && now.before(oneHourMinus(sunsetTime))) {
+			type = PhotoType.DIURNA;
+		// atardecer si now entre hora_atardecer - 1 y hora_anochecer
+		} else if (now.after(oneHourMinus(sunsetTime)) && now.before(twilightTime)) {
+			type = PhotoType.ATARDECER;
+		} // en cualquier otro caso en nocturna		
+		logger.debug("Tipo de foto calculado: " + type);
+		return type;	
+		
+	}
+	
+	private Calendar toCalendar(Time time) {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.SECOND, (int) Math.round(time.getSeconds()));
+		cal.set(Calendar.MINUTE, time.getMinutes());
+		cal.set(Calendar.HOUR_OF_DAY, time.getHours());
+		return cal;
+	}
+
+	private Calendar oneHourMinus(final Calendar cal) {
+		Calendar other = Calendar.getInstance();
+		other.setTime(cal.getTime());
+		other.add(Calendar.HOUR_OF_DAY, -1);
+		return other;
 	}
 
 }
