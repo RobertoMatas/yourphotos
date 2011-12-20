@@ -1,4 +1,4 @@
-var serverUrl = 'http://yourphotos.herokuapp.com';
+var serverUrl = 'http://yourphotos.herokuapp.com/maps';
 var q = jQuery.noConflict();
 var mapData = null;
 var map;
