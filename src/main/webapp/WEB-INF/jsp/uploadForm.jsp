@@ -14,6 +14,7 @@
 <form:form action="${uploadUrl }" commandName="photo" modelAttribute="photo" method="post" enctype="multipart/form-data">
 	<fieldset>
 		<legend class="leyenda">Subir una foto</legend>
+		<form:errors path="*" />
 		<p>
             <form:label path="comment">Comentario:</form:label>
 		    <form:textarea path="comment" cols="100" rows="2"  />

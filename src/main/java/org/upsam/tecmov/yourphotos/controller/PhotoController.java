@@ -79,6 +79,8 @@ public class PhotoController {
 			if (photoService.saveImage(photo)) {
 				status.setComplete();
 				return "redirect:/photos/show?page=0";
+			} else {
+				result.reject("photo.upload.error", "Ocurrió un error al subir la imagen");
 			}
 		}
 		return UPLOAD_FORM_VIEW;
