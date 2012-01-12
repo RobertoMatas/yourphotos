@@ -10,16 +10,21 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.upsam.tecmov.yourphotos.controller.form.PhotoForm;
+import org.upsam.tecmov.yourphotos.controller.view.PhotoOfTheWeekView;
 import org.upsam.tecmov.yourphotos.controller.view.PhotoView;
 import org.upsam.tecmov.yourphotos.domain.photo.Photo;
 import org.upsam.tecmov.yourphotos.domain.photo.PhotoRepository;
 import org.upsam.tecmov.yourphotos.service.PhotoService;
 
 @Service
+@Transactional(readOnly = true)
 public class PhotoServiceImpl implements PhotoService {
 
 	protected static Logger logger = Logger.getLogger(PhotoServiceImpl.class);
@@ -58,7 +63,6 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public Page<PhotoView> listAll(Pageable pageable) {
 		Page<Photo> page = photoRepository.findAll(pageable);
 		List<PhotoView> view = new ArrayList<PhotoView>();
@@ -75,13 +79,25 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public PhotoView getImage(Long id) {
 		Photo photo = photoRepository.findOne(id);
 		PhotoView pview = new PhotoView();
 		pview.setPhoto(new ByteArrayInputStream(photo.getPhoto()));
 		pview.setContentType(photo.getContentType());
 		return pview;
+	}
+
+	@Override
+	public PhotoOfTheWeekView getPhotoOfTheWeek() {
+		Iterable<Photo> it = photoRepository.findAll(new PageRequest(0, 1, new Sort(Direction.DESC, "date")));
+		return it != null ? toPhotoOfTheWeekView(it.iterator().next()) : null;
+	}
+
+	private PhotoOfTheWeekView toPhotoOfTheWeekView(Photo photo) {
+		String relativeUrl = "/photos/image?id=" + photo.getId();
+		PhotoOfTheWeekView view = new PhotoOfTheWeekView(relativeUrl, photo.getComment());
+		logger.debug(view);
+		return view;
 	}
 
 }

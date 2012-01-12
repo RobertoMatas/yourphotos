@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.upsam.tecmov.yourphotos.controller.form.PhotoForm;
+import org.upsam.tecmov.yourphotos.controller.view.PhotoOfTheWeekView;
 import org.upsam.tecmov.yourphotos.controller.view.PhotoView;
 
 public interface PhotoService {
@@ -14,4 +15,6 @@ public interface PhotoService {
 	Page<PhotoView> listAll(Pageable pageable);
 
 	PhotoView getImage(Long id);
+	
+	PhotoOfTheWeekView getPhotoOfTheWeek();
 }
