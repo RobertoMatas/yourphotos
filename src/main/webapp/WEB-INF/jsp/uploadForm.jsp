@@ -22,6 +22,7 @@
         <p>
             <form:label path="photo">Foto:</form:label>
 		    <input type="file" name="photo"/>
+		    <form:errors path="photo" />
         </p>
         <p align="center">
 		    <input type="submit" value="Subir" class="boton" />

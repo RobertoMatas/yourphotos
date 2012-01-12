@@ -24,6 +24,7 @@ public class PhotoForm implements Serializable {
 	/**
 	 * Imagen
 	 */
+	@NotNull
 	private MultipartFile photo;
 
 	/**

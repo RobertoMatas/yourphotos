@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,11 +42,25 @@ public class PhotoController {
 	 * 
 	 */
 	private final Integer PAGE_SIZE = 2;
-
+	/**
+	 * Validador JSR-303
+	 */
+	private Validator validator;
 	/**
 	 * Servicio de fotos
 	 */
 	private PhotoService photoService;
+
+	/**
+	 * @param validator
+	 * @param photoService
+	 */
+	@Autowired
+	public PhotoController(Validator validator, PhotoService photoService) {
+		super();
+		this.validator = validator;
+		this.photoService = photoService;
+	}
 
 	@ModelAttribute("photo")
 	public PhotoForm modelAttribute() {
@@ -59,6 +74,7 @@ public class PhotoController {
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
 	public String handleFormUpload(@Valid @ModelAttribute("photo") PhotoForm photo, BindingResult result, SessionStatus status) throws IOException {
+		validator.validate(photo, result);
 		if (!result.hasErrors()) {
 			if (photoService.saveImage(photo)) {
 				status.setComplete();
@@ -81,19 +97,11 @@ public class PhotoController {
 		FileCopyUtils.copy(pv.getPhoto(), response.getOutputStream());
 	}
 
-	@ExceptionHandler({ IOException.class, MaxUploadSizeExceededException.class })
+	@ExceptionHandler( { IOException.class, MaxUploadSizeExceededException.class } )
 	public ModelAndView handleUploadException(Exception ex, HttpServletRequest request, HttpSession session) {
 		PhotoForm model = (PhotoForm) WebUtils.getOrCreateSessionAttribute(session, "photo", PhotoForm.class);
 		request.setAttribute("error", ex.getLocalizedMessage());
 		return new ModelAndView(UPLOAD_FORM_VIEW, "photo", model);
 	}
 
-	/**
-	 * @param photoService
-	 *            the photoService to set
-	 */
-	@Autowired
-	public void setPhotoService(PhotoService photoService) {
-		this.photoService = photoService;
-	}
 }
