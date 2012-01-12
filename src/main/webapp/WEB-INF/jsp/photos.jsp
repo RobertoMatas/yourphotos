@@ -56,5 +56,7 @@
 </ul>
 </div>
 <!-- FIN PAGINCACION -->
+<c:url value="/j_spring_security_logout" var="logout" scope="page" />
+<p><a href="${logout }">Logout</a></p>
 </body>
 </html>

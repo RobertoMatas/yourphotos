@@ -6,8 +6,9 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<security:http auto-config="true" use-expressions="true">
-		<security:intercept-url pattern="/login*"
-			filters="none" />
+		<security:intercept-url pattern="/login*" filters="none" />
+		<security:intercept-url pattern="/photos/show" access="hasRole('ROLE_ADMIN')" />
+		<security:intercept-url pattern="/photos/upload" access="hasRole('ROLE_ADMIN')" />
 		<security:form-login login-page="/login"
 			authentication-failure-url="/login?login_error=1" default-target-url="/" />
 		<security:remember-me key="${upsam.remember-me.key}" />
