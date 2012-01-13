@@ -24,8 +24,8 @@
 		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="messageConverters">
 			<list>
-				<ref bean="jacksonMessageConverter" />
-				<ref bean="pListConverter" />				
+				<ref bean="pListConverter" />	
+				<ref bean="jacksonMessageConverter" />							
 			</list>
 		</property>
 	</bean>
