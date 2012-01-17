@@ -42,7 +42,7 @@ public class PListAssembler extends AbstractAssembler<Object, String> {
 	}
 	
 	public PListAssembler() {
-		this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 
 
