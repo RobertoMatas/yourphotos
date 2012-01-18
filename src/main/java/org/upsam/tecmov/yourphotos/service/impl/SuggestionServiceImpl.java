@@ -65,6 +65,10 @@ public class SuggestionServiceImpl implements SuggestionService {
 		}
 		Suggestion suggestion = new Suggestion();
 		Calendar now = Calendar.getInstance();
+		// si es una sugerencia manual, la fecha debe estar indicada
+		if (form instanceof ManualSuggestionForm) {
+			now.setTime(((ManualSuggestionForm)form).getManualDate());
+		}
 		suggestion.setDate(now.getTime());
 		suggestion.setLatitude(form.getLat());
 		suggestion.setLongitude(form.getLng());
