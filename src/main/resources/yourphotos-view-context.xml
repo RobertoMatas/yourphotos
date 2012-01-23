@@ -25,7 +25,7 @@
 		<property name="messageConverters">
 			<list>
 				<ref bean="pListConverter" />	
-				<ref bean="jacksonMessageConverter" />							
+				<ref bean="jacksonMessageConverter" />			
 			</list>
 		</property>
 	</bean>

@@ -27,7 +27,8 @@ import uk.me.jstott.sun.Time;
 
 @Service
 public class SuggestionServiceImpl implements SuggestionService {
-	private static final TimeZone TIMEZONE_DEFAULT = TimeZone.getDefault();
+	private static final TimeZone TIMEZONE_DEFAULT = TimeZone.getTimeZone("Europe/Paris");
+	private final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	protected static Logger logger = Logger.getLogger(SuggestionServiceImpl.class);
 	/**
 	 * 
@@ -64,7 +65,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 			throw new ServiceException("No es posible registrar la sugerencia. No existe población para " + lc);
 		}
 		Suggestion suggestion = new Suggestion();
-		Calendar now = Calendar.getInstance();
+		Calendar now = Calendar.getInstance(TIMEZONE_DEFAULT);
 		// si es una sugerencia manual, la fecha debe estar indicada
 		if (form instanceof ManualSuggestionForm) {
 			now.setTime(((ManualSuggestionForm)form).getManualDate());
@@ -116,18 +117,18 @@ public class SuggestionServiceImpl implements SuggestionService {
 	*/
 	private PhotoType getPhotoType(SuggestionForm form) {
 		PhotoType type = PhotoType.NOCTURNA;
-		Calendar now = Calendar.getInstance();
+		Calendar now = Calendar.getInstance(TIMEZONE_DEFAULT);
 		logger.debug("TimeZone default is: " + TIMEZONE_DEFAULT);
 		// si es una sugerencia manual, la fecha debe estar indicada
 		if (form instanceof ManualSuggestionForm) {
+			logger.debug("Fecha introducida manualmente: " + dateFormat.format(((ManualSuggestionForm)form).getManualDate()));
 			now.setTime(((ManualSuggestionForm)form).getManualDate());
 		}
 		LatitudeLongitude latlng = new LatitudeLongitude(Double.parseDouble(form.getLat()), Double.parseDouble(form.getLng()));
-		Calendar sunriseTime = toCalendar(Sun.sunriseTime(now, latlng, TIMEZONE_DEFAULT, true));
-		Calendar sunsetTime = toCalendar(Sun.sunsetTime(now, latlng, TIMEZONE_DEFAULT, true));
-		Calendar twilightTime = toCalendar(Sun.eveningCivilTwilightTime(now, latlng, TIMEZONE_DEFAULT, true));
-		if (logger.isDebugEnabled()) {
-			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Calendar sunriseTime = toCalendar(now, Sun.sunriseTime(now, latlng, TIMEZONE_DEFAULT, true));
+		Calendar sunsetTime = toCalendar(now, Sun.sunsetTime(now, latlng, TIMEZONE_DEFAULT, true));
+		Calendar twilightTime = toCalendar(now, Sun.eveningCivilTwilightTime(now, latlng, TIMEZONE_DEFAULT, true));
+		if (logger.isDebugEnabled()) {			
 			logger.debug("Amanecer: " + dateFormat.format(sunriseTime.getTime()));
 			logger.debug("Atardecer: " + dateFormat.format(sunsetTime.getTime()));
 			logger.debug("Anochecer: " + dateFormat.format(twilightTime.getTime()));
@@ -148,17 +149,18 @@ public class SuggestionServiceImpl implements SuggestionService {
 		
 	}
 	
-	private Calendar toCalendar(Time time) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.MILLISECOND, 0);
-		cal.set(Calendar.SECOND, (int) Math.round(time.getSeconds()));
-		cal.set(Calendar.MINUTE, time.getMinutes());
-		cal.set(Calendar.HOUR_OF_DAY, time.getHours());
-		return cal;
+	private Calendar toCalendar(Calendar cal, Time time) {
+		Calendar other = Calendar.getInstance(TIMEZONE_DEFAULT);
+		other.setTime(cal.getTime());
+		other.set(Calendar.MILLISECOND, 0);
+		other.set(Calendar.SECOND, (int) Math.round(time.getSeconds()));
+		other.set(Calendar.MINUTE, time.getMinutes());
+		other.set(Calendar.HOUR_OF_DAY, time.getHours());
+		return other;
 	}
 
 	private Calendar oneHourMinus(final Calendar cal) {
-		Calendar other = Calendar.getInstance();
+		Calendar other = Calendar.getInstance(TIMEZONE_DEFAULT);
 		other.setTime(cal.getTime());
 		other.add(Calendar.HOUR_OF_DAY, -1);
 		return other;

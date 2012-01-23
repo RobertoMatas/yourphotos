@@ -28,6 +28,11 @@ public class LocationForm implements Serializable {
 	 * Si el cliente no establece una, no se aplica el filtro
 	 */
 	private Integer category;
+	/**
+	 * Distancia (en metros) mínima de visualización.
+	 * Si el cliente no establece una, no se aplica el filtro
+	 */
+	private Integer distancia;
 
 	/**
 	 * @param lat
@@ -38,6 +43,7 @@ public class LocationForm implements Serializable {
 		this.lat = lat;
 		this.lng = lng;
 		this.category = -1;
+		this.distancia = 0;
 	}
 
 	/**
@@ -90,6 +96,20 @@ public class LocationForm implements Serializable {
 	 */
 	public void setCategory(Integer category) {
 		this.category = category != null && category <=5 ? category - 1 : -1;
+	}
+
+	/**
+	 * @param distancia the distancia to set
+	 */
+	public void setDistancia(Integer distancia) {
+		this.distancia = distancia != null ? distancia : 0;
+	}
+
+	/**
+	 * @return the distancia
+	 */
+	public Integer getDistancia() {
+		return distancia;
 	}
 
 }

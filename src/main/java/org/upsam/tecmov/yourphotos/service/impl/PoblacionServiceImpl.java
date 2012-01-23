@@ -109,37 +109,36 @@ public class PoblacionServiceImpl implements PoblacionService {
 	@Override
 	public Page<PoblacionWithDetailsView> findByPoblacionWithSuggestions(LocationForm coordenadas,
 			Integer page, Integer size, InfoOrder order) {
-		Page<Poblacion> poblaciones = null;
+		List<Poblacion> poblaciones = null;
+		PageRequest pageable = null;
 		if (order.equals(InfoOrder.tiempo)) {
-			PageRequest pageable = new PageRequest(page, size, new Sort(Direction.DESC,
-					"lastSuggestion"));
-			poblaciones = poblacionRepository
-					.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0,
-							coordenadas.getCategory(), pageable);
-			return new PageImpl<PoblacionWithDetailsView>(toView(coordenadas,
-					poblaciones.getContent()), pageable, poblaciones.getTotalElements());
-
+			poblaciones = poblacionRepository.findByNumSuggestionsGreaterThanAndCategoryGreaterThanOrderByLastSuggestionDesc(0, coordenadas.getCategory());
 		} else {
-			poblaciones = poblacionRepository
-					.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0,
-							coordenadas.getCategory(), null);
-			List<PoblacionWithDetailsView> view = toView(coordenadas, poblaciones.getContent());
-			reorder(order, view);
-			int fromIndex = page != null && size != null ? page * size : 0;
-			int toIndex = (page == null && size == null) || (fromIndex + size) > view.size() ? view
-					.size() : fromIndex + size;
-			PageRequest pageable = (page == null && size == null) ? null : new PageRequest(page, size);
-			return new PageImpl<PoblacionWithDetailsView>(view.subList(fromIndex, toIndex),
-					pageable, view.size());
+			poblaciones = poblacionRepository.findByNumSuggestionsGreaterThanAndCategoryGreaterThan(0, coordenadas.getCategory());
 		}
+		List<PoblacionWithDetailsView> view = toView(coordenadas, poblaciones);
+		reorder(order, view);
+		int fromIndex = page != null && size != null ? page * size : 0;
+		int toIndex = (page == null && size == null) || (fromIndex + size) > view.size() ? view.size() : fromIndex + size;
+		pageable = (page == null && size == null) ? null : new PageRequest(page, size);
+		return new PageImpl<PoblacionWithDetailsView>(view.subList(fromIndex, toIndex), pageable, view.size());
+		
 	}
 
 	private List<PoblacionWithDetailsView> toView(LocationForm coordenadas,
 			List<Poblacion> listPoblaciones) {
 		List<PoblacionWithDetailsView> view = new ArrayList<PoblacionWithDetailsView>(
 				listPoblaciones.size());
+		Integer distancia = coordenadas.getDistancia() != null ? coordenadas.getDistancia() : 0;
+		PoblacionWithDetailsView viewItem = null;
 		for (Poblacion poblacion : listPoblaciones) {
-			view.add(toView(coordenadas, poblacion));
+			viewItem = toView(coordenadas, poblacion);
+			// si aplica el filtro por distancia, descartamos las poblaciones que no cumplan dicho filtro
+			if (distancia != 0 && viewItem.getDistancia() < distancia) {
+				view.add(viewItem);
+			} else if (distancia == 0) {
+				view.add(viewItem);
+			}
 		}
 		return view;
 	}
