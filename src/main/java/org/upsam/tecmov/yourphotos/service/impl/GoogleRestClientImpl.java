@@ -106,6 +106,7 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 			logger.error("URI para llamar al servicio de Google mal formada", e);
 		}
 		try {
+			logger.debug("getDistance() -> URI: " + uri);
 			return extractDistance(restTemplate.getForObject(uri, String.class));
 
 		} catch (JsonParseException e) {
@@ -122,6 +123,7 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 
 	private Integer extractDistance(String json) throws JsonParseException, JsonMappingException,
 			IOException {
+		logger.debug("extractDistance() -> JSON: " + json);
 		JsonNode rootNode = mapper.readValue(new StringReader(json), JsonNode.class);
 		JsonNode legs = rootNode.findValue("legs");
 		JsonNode distance = legs.findValue("distance");
