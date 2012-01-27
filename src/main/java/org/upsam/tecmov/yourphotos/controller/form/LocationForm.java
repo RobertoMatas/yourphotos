@@ -15,13 +15,13 @@ public class LocationForm implements Serializable {
 	 * Latitud
 	 */
 	@NotNull
-	@Digits(integer = 3, fraction = 8)
+	@Digits(integer = 3, fraction = 20)
 	private String lat;
 	/**
 	 * Longitud
 	 */
 	@NotNull
-	@Digits(integer = 3, fraction = 8)
+	@Digits(integer = 3, fraction = 20)
 	private String lng;
 	/**
 	 * Categoría mínima de visualización
