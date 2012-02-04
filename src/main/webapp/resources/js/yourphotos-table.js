@@ -1,4 +1,4 @@
-var estadisticas = "http://localhost:8080/yourphotos/statistics/table-estadistica";
+var estadisticas = "http://yourphotos.herokuapp.com/statistics/table-estadistica";
 
 google.load('visualization', '1.0', {'packages':['table']});
 

@@ -1,5 +1,5 @@
-var estadisticas1 = "http://localhost:8080/yourphotos/statistics/poblaciones-sugerencias";
-var estadisticas2 = "http://localhost:8080/yourphotos/statistics/geo-estadistica";
+var estadisticas1 = "http://yourphotos.herokuapp.com/statistics/poblaciones-sugerencias";
+var estadisticas2 = "http://yourphotos.herokuapp.com/statistics/geo-estadistica";
 //Load the Visualization API and the piechart package.
 google.load('visualization', '1.0', {'packages':['corechart','geochart']});
 
