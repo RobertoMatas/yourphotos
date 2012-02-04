@@ -41,7 +41,7 @@ public class PhotoController {
 	/**
 	 * 
 	 */
-	private final Integer PAGE_SIZE = 2;
+	private final Integer PAGE_SIZE = 5;
 	/**
 	 * Validador JSR-303
 	 */

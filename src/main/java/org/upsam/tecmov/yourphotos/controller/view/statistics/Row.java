@@ -11,9 +11,7 @@ public class Row implements Serializable {
 	 */
 	private static final long serialVersionUID = -4422277241395142923L;
 
-	private String titleColumn;
-
-	private Integer valueColumn;
+	private List<Object> row;
 
 	/**
 	 * @param titleColumn
@@ -21,15 +19,23 @@ public class Row implements Serializable {
 	 */
 	public Row(String titleColumn, Integer valueColumn) {
 		super();
-		this.titleColumn = titleColumn;
-		this.valueColumn = valueColumn;
+		this.row = new ArrayList<Object>(2);
+		this.row.add(titleColumn);
+		this.row.add(valueColumn);
+	}
+	
+	public Row(String poblacion, Integer sugerencias, Integer categoria, String provincia, String comunidad) {
+		super();
+		this.row = new ArrayList<Object>(5);
+		this.row.add(poblacion);
+		this.row.add(sugerencias);
+		this.row.add(categoria);
+		this.row.add(provincia);
+		this.row.add(comunidad);
 	}
 
 	public List<Object> toArray() {
-		List<Object> list = new ArrayList<Object>(2);
-		list.add(this.titleColumn);
-		list.add(this.valueColumn);
-		return list;
+		return row;
 	}
 
 }

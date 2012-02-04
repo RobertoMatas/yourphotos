@@ -18,9 +18,13 @@
 </sec:authorize>
 <c:url value="/photos/show" var="pshow" scope="page" />
 <c:url value="/photos/upload" var="pupload" scope="page" />
+<c:url value="/statistics/show" var="charts" scope="page" />
+<c:url value="/statistics/show-table" var="tablesummary" scope="page" />
 <ol>
 	<li><a href="${pupload }">Subir una foto</a></li>
 	<li><a href="${pshow }">Listar fotos</a></li>
+	<li><a href="${charts }">Estadísticas</a></li>
+	<li><a href="${tablesummary }">Resumen</a></li>
 </ol>
 </body>
 </html>

@@ -8,14 +8,10 @@
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript" src="<c:url value="/resources/js/jquery-1.7.1.min.js" />"></script>
-<script type="text/javascript" src="<c:url value="/resources/js/yourphotos-charts.js" />"></script>
+<script type="text/javascript" src="<c:url value="/resources/js/yourphotos-table.js" />"></script>
 </head>
 <body>
-<div id="chart_div"></div>
-
-<div id="chart_div3"></div>
-
-<div id="chart_div2"></div>
+<div id="chart_table"></div>
 <c:url value="/j_spring_security_logout" var="logout" scope="page" />
 <p><a href="${logout }">Logout</a></p>
 </body>

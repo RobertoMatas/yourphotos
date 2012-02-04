@@ -8,6 +8,7 @@ import org.upsam.tecmov.yourphotos.controller.view.statistics.Statistics;
 import org.upsam.tecmov.yourphotos.service.StatisticsService;
 
 @Controller
+@RequestMapping("/statistics")
 public class StatisticsController {
 	/**
 	 * Servicio de gestión de Stadísticas
@@ -23,14 +24,31 @@ public class StatisticsController {
 		this.statisticsService = statisticsService;
 	}
 
-	@RequestMapping("/statistics")
+	@RequestMapping("/show")
 	public String showStatistics() {
 		return "statistics";
 	}
+	
+	@RequestMapping("/show-table")
+	public String showStatisticsTable() {
+		return "statisticsTable";
+	}
 
-	@RequestMapping("/statistics/poblaciones-sugerencias")
+	@RequestMapping("/poblaciones-sugerencias")
 	@ResponseBody
 	public Statistics showStatisticsPoblacionesSugerencias() {
 		return statisticsService.getPoblacionesYsugerencias();
+	}
+	
+	@RequestMapping("/geo-estadistica")
+	@ResponseBody
+	public Statistics showGeoStatistics() {
+		return statisticsService.getGeoEstadistica();
+	}
+	
+	@RequestMapping("/table-estadistica")
+	@ResponseBody
+	public Statistics showTableStatistics() {
+		return statisticsService.getTableStatistics();
 	}
 }
