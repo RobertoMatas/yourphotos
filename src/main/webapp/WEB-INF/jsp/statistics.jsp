@@ -11,6 +11,8 @@
 <script type="text/javascript" src="<c:url value="/resources/js/yourphotos-charts.js" />"></script>
 </head>
 <body>
+<c:url value="/" var="inicio" scope="page" />
+<p><a href="${inicio }">Inicio</a></p>
 <div id="chart_div"></div>
 
 <div id="chart_div3"></div>

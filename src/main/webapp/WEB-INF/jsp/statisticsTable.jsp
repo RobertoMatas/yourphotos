@@ -11,6 +11,8 @@
 <script type="text/javascript" src="<c:url value="/resources/js/yourphotos-table.js" />"></script>
 </head>
 <body>
+<c:url value="/" var="inicio" scope="page" />
+<p><a href="${inicio }">Inicio</a></p>
 <div id="chart_table"></div>
 <c:url value="/j_spring_security_logout" var="logout" scope="page" />
 <p><a href="${logout }">Logout</a></p>
