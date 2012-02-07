@@ -123,6 +123,7 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 
 	private Integer extractDistance(String json) throws JsonParseException, JsonMappingException,
 			IOException {
+		//logger.debug("extractDistance() -> JSON: " + json);
 		JsonNode rootNode = mapper.readValue(new StringReader(json), JsonNode.class);
 		JsonNode legs = rootNode.findValue("legs");
 		JsonNode distance = legs.findValue("distance");
@@ -160,14 +161,18 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 	@Override
 	public InputStream getMap(LocationForm coordenadas, List<PoblacionWithDetailsView> markers) {
 		String uri = null;
+		uri = BASE_MAPS_URL + "&size=80x80&center=" + coordenadas.getLat() + "," + coordenadas.getLng()
+			+ "&markers=icon:" + ICON_MARKER_WITH_STAR + "|" + coordenadas.getLat() + "," + coordenadas.getLng();
+		/*
 		try {
-			uri = BASE_MAPS_URL + "&size=90x90&center=" + coordenadas.getLat()
+			uri = BASE_MAPS_URL + "&size=80x80&center=" + coordenadas.getLat()
 					+ "," + coordenadas.getLng() + generateMarkers(markers);
-			logger.debug("Generada url: " + uri);
+			
 		} catch (UnsupportedEncodingException e) {
 			logger.error("Error al hacer un encode de la url del icono", e);
 		}
-
+		*/
+		logger.debug("Generada url: " + uri);
 		try {
 			if (uri != null) {
 				byte[] bytes = restTemplate.getForObject(uri, byte[].class);
@@ -182,6 +187,7 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 
 	}
 
+	@SuppressWarnings("unused")
 	private String generateMarkers(List<PoblacionWithDetailsView> markers)
 			throws UnsupportedEncodingException {
 		if (markers == null || markers.isEmpty()) {
