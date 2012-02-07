@@ -9,8 +9,11 @@
 <title>Subir una foto</title>
 </head>
 <body>
+<c:url value="/" var="inicio" scope="page" />
+<p><a href="${inicio }">Inicio</a></p>
 <c:out value="${requestScope.error }" />
 <c:url var="uploadUrl" value="/photos/upload" />
+<h2>Subir una foto</h2>
 <form:form action="${uploadUrl }" commandName="photo" modelAttribute="photo" method="post" enctype="multipart/form-data">
 	<fieldset>
 		<legend class="leyenda">Subir una foto</legend>

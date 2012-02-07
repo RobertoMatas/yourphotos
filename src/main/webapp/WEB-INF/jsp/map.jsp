@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Google Maps JavaScript API v3 Example: Map Simple</title>
+<title>Mapa</title>
 <meta name="viewport"
 	content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>

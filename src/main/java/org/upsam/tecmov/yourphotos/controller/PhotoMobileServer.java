@@ -1,6 +1,7 @@
 package org.upsam.tecmov.yourphotos.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -119,7 +120,12 @@ public class PhotoMobileServer {
 	public void getMapStaticWithPoblaciones(LocationForm form, HttpServletResponse response) throws IOException {
 		response.setContentType("image/png");
 		Page<PoblacionWithDetailsView> page = poblacionService.findByPoblacionWithSuggestions(form, null, null, InfoOrder.categoria);
-		FileCopyUtils.copy(client.getMap(form, page.getContent()), response.getOutputStream());
+		InputStream is = client.getMap(form, page.getContent());
+		if (is != null) {
+			FileCopyUtils.copy(is, response.getOutputStream());
+		} else {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@RequestMapping("/maps")

@@ -123,7 +123,6 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 
 	private Integer extractDistance(String json) throws JsonParseException, JsonMappingException,
 			IOException {
-		logger.debug("extractDistance() -> JSON: " + json);
 		JsonNode rootNode = mapper.readValue(new StringReader(json), JsonNode.class);
 		JsonNode legs = rootNode.findValue("legs");
 		JsonNode distance = legs.findValue("distance");
@@ -162,7 +161,7 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 	public InputStream getMap(LocationForm coordenadas, List<PoblacionWithDetailsView> markers) {
 		String uri = null;
 		try {
-			uri = BASE_MAPS_URL + "&size=640x640&center=" + coordenadas.getLat()
+			uri = BASE_MAPS_URL + "&size=90x90&center=" + coordenadas.getLat()
 					+ "," + coordenadas.getLng() + generateMarkers(markers);
 			logger.debug("Generada url: " + uri);
 		} catch (UnsupportedEncodingException e) {

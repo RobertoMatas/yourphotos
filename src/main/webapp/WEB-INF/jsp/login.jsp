@@ -20,7 +20,7 @@
     	<form id="loginForm" action="<c:url value="/j_spring_security_check" />" method="POST">
 			<table cellpadding="2" cellspacing="0" align="center">
 				<tr>
-					<td colspan="2"><img src="<c:url value="/resources/images/MadridPlaces.png" />"
+					<td colspan="2"><img src="<c:url value="/resources/img/YourPhotos.png" />"
 						alt="MadridPlaces" border="0" /></td>
 				</tr>
 				<tr>

@@ -29,7 +29,7 @@ function drawChart(dataTable) {
 	var data = getDataForChart(dataTable);
 	
 	// Set chart options
-	var options = {'title':'Número de sugerencias por poblacion',
+	var options = {'title':'Número de sugerencias por población',
 	               'width':800,
 	               'height':600};
 	

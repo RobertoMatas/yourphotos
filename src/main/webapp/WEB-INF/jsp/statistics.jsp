@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Estadísticas</title>
 <!--Load the AJAX API-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript" src="<c:url value="/resources/js/jquery-1.7.1.min.js" />"></script>
@@ -13,6 +13,7 @@
 <body>
 <c:url value="/" var="inicio" scope="page" />
 <p><a href="${inicio }">Inicio</a></p>
+<h2>Estadísticas</h2>
 <div id="chart_div"></div>
 
 <div id="chart_div3"></div>
