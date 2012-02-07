@@ -161,7 +161,7 @@ public class GoogleRestClientImpl implements GoogleRestClient {
 	@Override
 	public InputStream getMap(LocationForm coordenadas, List<PoblacionWithDetailsView> markers) {
 		String uri = null;
-		uri = BASE_MAPS_URL + "&size=80x80&center=" + coordenadas.getLat() + "," + coordenadas.getLng()
+		uri = BASE_MAPS_URL + "&size=150x126&center=" + coordenadas.getLat() + "," + coordenadas.getLng()
 			+ "&zoom=14&markers=icon:" + ICON_MARKER_WITH_STAR + "|" + coordenadas.getLat() + "," + coordenadas.getLng();
 		/*
 		try {
